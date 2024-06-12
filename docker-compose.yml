@@ -1,0 +1,42 @@
+﻿networks:
+  cm-backend-network:
+    external: true
+    driver: bridge
+
+services:
+  database:
+    container_name: auth.data
+    image: mysql:latest
+    ports:
+      - '3310:3306'
+    restart: always
+    networks: 
+      - cm-backend-network
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASS}'
+      MYSQL_PASSWORD: '${DB_PASS}'
+      MYSQL_USER: '${DB_USER}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+    volumes:
+      - cm_auth_data:/var/lib/mysql_data/data
+  
+  auth.api:
+    container_name: auth.api
+    image: auth.api
+    depends_on: 
+      - 'database'
+    restart: always
+    networks: 
+      - cm-backend-network
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - '5400:5400'
+      - '5401:5401'
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=auth.data;Port=3306;Database='${DB_DATABASE}';Uid='${DB_USER}';Pwd='${DB_PASS}';
+      - ASPNETCORE_URLS=http://+:5400
+
+volumes:
+  cm_auth_data:

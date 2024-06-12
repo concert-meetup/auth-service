@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using auth.API.Config;
 using auth.API.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -33,6 +34,7 @@ public class AuthController : ControllerBase
     {
         if (ModelState.IsValid)
         {
+            // TODO validate email
             var emailExist = await _userManager.FindByEmailAsync(request.Email);
 
             if (emailExist != null)
@@ -41,7 +43,7 @@ public class AuthController : ControllerBase
             }
 
             var newUser = new IdentityUser()
-            {
+            { 
                 Email = request.Email,
                 UserName = request.Email
             };
@@ -50,7 +52,7 @@ public class AuthController : ControllerBase
             if (isCreated.Succeeded)
             {
                 var token = GenerateJwtToken(newUser);
-                return Ok(new UserRegistrationResponseDto()
+                return Ok(new AuthToken()
                 {
                     Result = true,
                     Token = token
@@ -95,6 +97,13 @@ public class AuthController : ControllerBase
         return BadRequest("Invalid request");
     }
 
+    [HttpGet]
+    [Authorize]
+    public string GetTestMessage()
+    {
+        return "Authorised message";
+    }
+
     private string GenerateJwtToken(IdentityUser user)
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -110,6 +119,8 @@ public class AuthController : ControllerBase
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             }),
+            Issuer = "localhost",
+            Audience = "http://concert-meetup/api",
             // TODO change expiry time to 5 min after testing
             Expires = DateTime.UtcNow.AddHours(4),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),

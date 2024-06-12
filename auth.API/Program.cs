@@ -42,11 +42,15 @@ builder.Services.AddAuthentication(options =>
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuer = true,
-            ValidateAudience = false,
-            RequireExpirationTime = false,
-            ValidateLifetime = false
+            ValidateAudience = true,
+            RequireExpirationTime = false, // update for refresh token
+            ValidateLifetime = true,
+            ValidIssuer = "localhost",
+            ValidAudience = "http://concert-meetup/api"
         };
     });
+
+builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -59,12 +63,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHealthChecks("/health");
 
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+ 
 app.MapControllers();
 
 app.Run();

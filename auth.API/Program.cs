@@ -27,6 +27,20 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 
 builder.Services.AddHealthChecks();
 
+// auth
+var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value);
+var tokenValidationParameters = new TokenValidationParameters()
+{
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(key),
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    RequireExpirationTime = false, // update for refresh token
+    ValidateLifetime = true,
+    ValidIssuer = "localhost",
+    ValidAudience = "http://concert-meetup/api"
+};
+
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,20 +49,11 @@ builder.Services.AddAuthentication(options =>
     })
     .AddJwtBearer(jwt =>
     {
-        var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value);
         jwt.SaveToken = true;
-        jwt.TokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            RequireExpirationTime = false, // update for refresh token
-            ValidateLifetime = true,
-            ValidIssuer = "localhost",
-            ValidAudience = "http://concert-meetup/api"
-        };
+        jwt.TokenValidationParameters = tokenValidationParameters;
     });
+
+builder.Services.AddSingleton(tokenValidationParameters);
 
 builder.Services.AddCors();
 

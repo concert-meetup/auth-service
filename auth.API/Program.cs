@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? $"Server={Environment.GetEnvironmentVariable("DB_HOST")};" +
@@ -36,7 +37,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 builder.Services.AddHealthChecks();
 
 // auth
-var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value);
+var key = Encoding.ASCII.GetBytes(jwtConfig.Secret);
 var tokenValidationParameters = new TokenValidationParameters()
 {
     ValidateIssuerSigningKey = true,

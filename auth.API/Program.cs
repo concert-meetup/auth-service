@@ -10,11 +10,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                       ?? $"Server={Environment.GetEnvironmentVariable("DB_HOST")};" +
+                       $"Database={Environment.GetEnvironmentVariable("DB_NAME_AUTH")};" +
+                       $"User Id={Environment.GetEnvironmentVariable("DB_USER")};" +
+                       $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD")};";
+
 builder.Services.AddDbContext<AuthDbContext>(options => 
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

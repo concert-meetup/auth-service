@@ -39,7 +39,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 builder.Services.AddHealthChecks();
 
 // auth
-var key = Encoding.ASCII.GetBytes(jwtConfig.Secret);
+var key = "hiUilgpplHyDpbGIujiSOTKHqKfmhppDLATiXlYlXNLzURpUPqkKEqGXLTUsyhQR"u8.ToArray();
 var tokenValidationParameters = new TokenValidationParameters()
 {
     ValidateIssuerSigningKey = true,

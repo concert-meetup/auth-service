@@ -89,7 +89,7 @@ metadata:
   name: jwt-config
 type: Opaque
 data:
-  Secret: "hiUilgdpplHyDpbGIujiSOTKHqKfmhppDLATiXlYlXNLzURpUPqkKEqG\LTUsyhQR"
+  Secret: "aGlVaWxnZHBwbEh5RHBiR0l1amlTT1RLSHFLZm1ocHBETEFUaVhsWWxYTkx6VVJwVVBxa0tFcUdcTFRVc3loUVI="
   ExpiryTimeFrame: "MDA6MDU6MDA="
   Issuer: "bG9jYWxob3N0"
   Audience: "aHR0cDovL2NvbmNlcnQtbWVldHVwL2FwaQ=="

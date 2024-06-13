@@ -140,7 +140,8 @@ public class AuthController : ControllerBase
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
 
-        var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+        // var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+        var key = "hiUilgpplHyDpbGIujiSOTKHqKfmhppDLATiXlYlXNLzURpUPqkKEqGXLTUsyhQR"u8.ToArray();
 
         var tokenDescriptor = new SecurityTokenDescriptor()
         {
@@ -153,9 +154,9 @@ public class AuthController : ControllerBase
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToUniversalTime().ToString())
             }),
             // Issuer = _jwtConfig.Issuer,
-            Audience = _jwtConfig.Audience,
-            // TODO change expiry time to 5 min after testing
-            Expires = DateTime.UtcNow.Add(_jwtConfig.ExpiryTimeFrame),
+            // Audience = _jwtConfig.Audience,
+            Audience = "http://concert-meetup/api",
+            Expires = DateTime.UtcNow.AddMinutes(5),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha512)
         };

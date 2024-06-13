@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  labels:
+    app: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        env: prod
+        app.kubernetes.io/name: auth-service
+    spec:
+      containers:
+        - name: auth-service
+          image: estherw66/auth-service:latest
+          ports:
+            - containerPort: 5400
+              name: proxy
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: ASPNETCORE_URLS
+              value: http://*:5400
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  ports:
+    - name: proxy
+      port: 5400
+      protocol: TCP
+      targetPort: 5400
+  selector:
+    app: auth-service

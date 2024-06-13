@@ -39,7 +39,7 @@ spec:
                 secretKeyRef:
                   name: mysql-secret
                   key: DB_PASSWORD
-            - name: DB_NAME_CONCERT
+            - name: DB_NAME_AUTH
               valueFrom:
                 secretKeyRef:
                   name: mysql-secret

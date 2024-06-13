@@ -48,22 +48,22 @@ spec:
               value: "Production"
             - name: ASPNETCORE_URLS
               value: http://*:5400
-            - name: Jwt__Secret
+            - name: Secret
               valueFrom:
                 secretKeyRef:
                   name: jwt-config
                   key: Secret
-            - name: Jwt__ExpiryTimeFrame
+            - name: ExpiryTimeFrame
               valueFrom:
                 secretKeyRef:
                   name: jwt-config
                   key: ExpiryTimeFrame
-            - name: Jwt__Issuer
+            - name: Issuer
               valueFrom:
                 secretKeyRef:
                   name: jwt-config
                   key: Issuer
-            - name: Jwt__Audience
+            - name: Audience
               valueFrom:
                 secretKeyRef:
                   name: jwt-config
@@ -89,7 +89,7 @@ metadata:
   name: jwt-config
 type: Opaque
 data:
-  Secret: "aGlVaWxnZHBwbEh5RHBiR0l1amlTT1RLSHFLZm1ocHBETEFUaVhsWWxYTkx6VVJwVVBxa0tFcUdcTFRVc3loUVI="
+  Secret: "hiUilgdpplHyDpbGIujiSOTKHqKfmhppDLATiXlYlXNLzURpUPqkKEqG\LTUsyhQR"
   ExpiryTimeFrame: "MDA6MDU6MDA="
   Issuer: "bG9jYWxob3N0"
   Audience: "aHR0cDovL2NvbmNlcnQtbWVldHVwL2FwaQ=="

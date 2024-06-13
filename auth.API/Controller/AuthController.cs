@@ -152,7 +152,7 @@ public class AuthController : ControllerBase
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToUniversalTime().ToString())
             }),
-            Issuer = _jwtConfig.Issuer,
+            // Issuer = _jwtConfig.Issuer,
             Audience = _jwtConfig.Audience,
             // TODO change expiry time to 5 min after testing
             Expires = DateTime.UtcNow.Add(_jwtConfig.ExpiryTimeFrame),

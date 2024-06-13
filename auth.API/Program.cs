@@ -11,8 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 
+var jwtConfig = new JwtConfig();
+builder.Configuration.Bind("JwtConfig", jwtConfig);
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
-var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? $"Server={Environment.GetEnvironmentVariable("DB_HOST")};" +
@@ -42,11 +44,11 @@ var tokenValidationParameters = new TokenValidationParameters()
 {
     ValidateIssuerSigningKey = true,
     IssuerSigningKey = new SymmetricSecurityKey(key),
-    ValidateIssuer = true,
+    ValidateIssuer = false,
     ValidateAudience = true,
     RequireExpirationTime = false, // update for refresh token
     ValidateLifetime = true,
-    ValidIssuer = "localhost",
+    // ValidIssuer = "localhost",
     ValidAudience = "http://concert-meetup/api"
 };
 

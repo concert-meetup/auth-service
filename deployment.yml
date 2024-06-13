@@ -24,10 +24,51 @@ spec:
               name: proxy
               protocol: TCP
           env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_HOST
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_PASSWORD
+            - name: DB_NAME_CONCERT
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: DB_NAME_AUTH
             - name: ASPNETCORE_ENVIRONMENT
               value: "Production"
             - name: ASPNETCORE_URLS
               value: http://*:5400
+            - name: Jwt__Secret
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-config
+                  key: Secret
+            - name: Jwt__ExpiryTimeFrame
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-config
+                  key: ExpiryTimeFrame
+            - name: Jwt__Issuer
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-config
+                  key: Issuer
+            - name: Jwt__Audience
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-config
+                  key: Audience
+            
 ---
 apiVersion: v1
 kind: Service
@@ -41,3 +82,14 @@ spec:
       targetPort: 5400
   selector:
     app: auth-service
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jwt-config
+type: Opaque
+data:
+  Secret: "aGlVaWxnZHBwbEh5RHBiR0l1amlTT1RLSHFLZm1ocHBETEFUaVhsWWxYTkx6VVJwVVBxa0tFcUdcTFRVc3loUVI="
+  ExpiryTimeFrame: "MDA6MDU6MDA="
+  Issuer: "bG9jYWxob3N0"
+  Audience: "aHR0cDovL2NvbmNlcnQtbWVldHVwL2FwaQ=="

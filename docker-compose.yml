@@ -37,6 +37,7 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Server=auth.data;Port=3306;Database='${DB_DATABASE}';Uid='${DB_USER}';Pwd='${DB_PASS}';
       - ASPNETCORE_URLS=http://+:5400
+      - RabbitMQ__HostName=rabbitmq
 
 volumes:
   cm_auth_data:

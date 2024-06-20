@@ -46,10 +46,10 @@ var tokenValidationParameters = new TokenValidationParameters()
     IssuerSigningKey = new SymmetricSecurityKey(key),
     ValidateIssuer = false,
     ValidateAudience = true,
-    RequireExpirationTime = false, // update for refresh token
+    RequireExpirationTime = true,
     ValidateLifetime = true,
-    // ValidIssuer = "localhost",
-    ValidAudience = "http://concert-meetup/api"
+    ValidAudience = "http://concert-meetup/api",
+    ClockSkew = TimeSpan.Zero
 };
 
 builder.Services.AddAuthentication(options =>
@@ -85,7 +85,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHealthChecks("/health");
 
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+app.UseCors(x => x
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+        .WithOrigins("http://localhost:8000"));
 
 app.UseHttpsRedirection();
 

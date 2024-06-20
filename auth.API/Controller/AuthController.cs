@@ -87,6 +87,16 @@ public class AuthController : ControllerBase
             if (isPasswordValid)
             {
                 var token = await GenerateJwtToken(existingUser);
+                
+                // http only cookie for persistent login
+                Response.Cookies.Append("token", token.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddHours(1)
+                });
+                
                 return Ok(token);
             }
 
@@ -102,10 +112,34 @@ public class AuthController : ControllerBase
     {
         if (ModelState.IsValid)
         {
+            var refreshToken = Request.Cookies["token"];
+            _logger.LogInformation($"Token: {refreshToken}");
+            
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                refreshToken = request.RefreshToken;
+            }
+
+            request.RefreshToken = refreshToken;
+            
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                _logger.LogInformation("no refresh token");
+                return BadRequest(new AuthToken()
+                {
+                    Errors = new List<string>()
+                    {
+                        "No refresh token found"
+                    },
+                    Result = false
+                });
+            }
+            
             var result = await VerifyAndGenerateToken(request);
 
             if (result == null)
             {
+                _logger.LogInformation("verify result is null");
                 return BadRequest(new AuthToken()
                 {
                     Errors = new List<string>()
@@ -116,9 +150,18 @@ public class AuthController : ControllerBase
                 });
             }
 
+            Response.Cookies.Append("token", result.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddHours(1)
+            });
+
             return Ok(result);
         }
 
+        _logger.LogInformation("model state is not valid");
         return BadRequest(new AuthToken()
         {
             Errors = new List<string>()
@@ -127,6 +170,43 @@ public class AuthController : ControllerBase
             },
             Result = false
         });
+        
+        
+        // if (ModelState.IsValid)
+        // {
+        //     var result = await VerifyAndGenerateToken(request);
+        //
+        //     if (result == null)
+        //     {
+        //         return BadRequest(new AuthToken()
+        //         {
+        //             Errors = new List<string>()
+        //             {
+        //                 "Invalid tokens"
+        //             },
+        //             Result = false
+        //         });
+        //     }
+        //     
+        //     Response.Cookies.Append("token", result.RefreshToken, new CookieOptions
+        //     {
+        //         HttpOnly = true,
+        //         Secure = false,
+        //         SameSite = SameSiteMode.None,
+        //         Expires = DateTime.UtcNow.AddHours(1)
+        //     });
+        //
+        //     return Ok(result);
+        // }
+        //
+        // return BadRequest(new AuthToken()
+        // {
+        //     Errors = new List<string>()
+        //     {
+        //         "Invalid parameters"
+        //     },
+        //     Result = false
+        // });
     }
 
     [HttpGet]
@@ -192,10 +272,13 @@ public class AuthController : ControllerBase
 
         try
         {
-            _tokenValidationParameters.ValidateLifetime = false; // testing ? false : true
+            // _tokenValidationParameters.ValidateLifetime = true; // testing ? false : true
+            
+            var tokenValidationParameters = _tokenValidationParameters.Clone();
+            tokenValidationParameters.ValidateLifetime = false;
 
             var tokenInVerification = 
-                jwtTokenHandler.ValidateToken(request.Token, _tokenValidationParameters, out var validatedToken);
+                jwtTokenHandler.ValidateToken(request.Token, tokenValidationParameters, out var validatedToken);
 
             if (validatedToken is JwtSecurityToken jwtSecurityToken)
             {

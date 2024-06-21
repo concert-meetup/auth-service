@@ -86,10 +86,10 @@ if (app.Environment.IsDevelopment())
 app.UseHealthChecks("/health");
 
 app.UseCors(x => x
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials()
-        .WithOrigins("http://localhost:8000"));
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials()
+    .WithOrigins("http://localhost:8000", "98.66.224.145:8000"));
 
 app.UseHttpsRedirection();
 
